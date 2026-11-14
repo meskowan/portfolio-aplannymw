@@ -15,6 +15,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
 body {
@@ -42,6 +43,8 @@ button, input, textarea {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #ffffff12;
+  position: relative;
+  z-index: 5;
 }
 
 .brand {
@@ -73,7 +76,7 @@ button, input, textarea {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 25px;
 }
 
 .nav-actions > a,
@@ -81,6 +84,7 @@ button, input, textarea {
   color: #aeb8d2;
   text-decoration: none;
   font-size: 13px;
+  transition: color .2s;
 }
 
 .nav-actions > a:hover,
@@ -92,6 +96,7 @@ button, input, textarea {
 .secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   border: 1px solid #ffffff25;
   background: #ffffff08;
@@ -100,6 +105,25 @@ button, input, textarea {
   padding: 10px 14px;
   font: 600 13px 'DM Sans';
   text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-btn:hover,
+.secondary:hover {
+  background: #ffffff14;
+  border-color: #a58bff88;
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff25;
+  border-radius: 9px;
+  background: #ffffff08;
+  color: #fff;
   cursor: pointer;
 }
 
@@ -160,6 +184,7 @@ button, input, textarea {
   display: flex;
   gap: 12px;
   margin-top: 30px;
+  flex-wrap: wrap;
 }
 
 .primary {
@@ -525,6 +550,54 @@ button, input, textarea {
   white-space: nowrap;
 }
 
+/* Contact */
+.contact-section {
+  padding: 75px 0 85px;
+  border-top: 1px solid #ffffff13;
+  text-align: center;
+}
+
+.contact-section h2 {
+  font: 700 34px 'Space Grotesk';
+  margin: 12px 0;
+}
+
+.contact-section p {
+  max-width: 540px;
+  margin: 0 auto;
+  color: #98a5c2;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.contact-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 17px;
+  color: #e9ecf7;
+  text-decoration: none;
+  border: 1px solid #ffffff25;
+  border-radius: 9px;
+  background: #ffffff08;
+  font-size: 13px;
+  transition: .2s;
+}
+
+.contact-links a:hover {
+  border-color: #a58bff;
+  background: #8b5cf622;
+}
+
 .footer {
   padding: 22px 0 30px;
   border-top: 1px solid #ffffff13;
@@ -647,12 +720,37 @@ button, input, textarea {
     height: 70px;
   }
 
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+
   .nav-actions {
-    gap: 14px;
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    padding: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 17px;
+    background: #111a31;
+    border: 1px solid #ffffff20;
+    border-radius: 0 0 13px 13px;
+    box-shadow: 0 18px 35px #0008;
+  }
+
+  .nav-actions.menu-open {
+    display: flex;
   }
 
   .nav-actions > a {
-    display: none;
+    display: block;
+    padding: 7px 3px;
+  }
+
+  .nav-actions .admin-btn {
+    justify-content: center;
   }
 
   .hero {
@@ -723,6 +821,23 @@ button, input, textarea {
 
   .about .secondary {
     margin-left: 0;
+  }
+
+  .contact-section {
+    padding: 60px 0;
+  }
+
+  .contact-section h2 {
+    font-size: 29px;
+  }
+
+  .contact-links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contact-links a {
+    justify-content: center;
   }
 
   .footer {
