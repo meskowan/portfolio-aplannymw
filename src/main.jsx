@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+
 import {
   Github,
   ExternalLink,
@@ -11,7 +12,11 @@ import {
   X,
   FolderGit2,
   UserRound,
-  Code2
+  Code2,
+  Mail,
+  ArrowUpRight,
+  Home,
+  Menu
 } from 'lucide-react';
 
 import {
@@ -38,11 +43,15 @@ import './style.css';
 const CLOUDINARY_CLOUD_NAME = 'ew3vk9zg';
 const CLOUDINARY_UPLOAD_PRESET = 'aplannymw_unsigned';
 
+const GITHUB_URL = 'https://github.com/meskowan';
+
 function App() {
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
+
   const [showLogin, setShowLogin] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -62,12 +71,12 @@ function App() {
     !!user &&
     user.email?.toLowerCase() === ADMIN_EMAIL;
 
-  // Memeriksa status login admin
+  // MEMERIKSA STATUS LOGIN ADMIN
   useEffect(() => {
     return onAuthStateChanged(auth, setUser);
   }, []);
 
-  // Mengambil data proyek dari Firestore
+  // MENGAMBIL PROJECT DARI FIRESTORE
   useEffect(() => {
     const q = query(
       collection(db, 'projects'),
@@ -88,7 +97,7 @@ function App() {
     );
   }, []);
 
-  // Login admin
+  // LOGIN ADMIN
   async function login(e) {
     e.preventDefault();
     setError('');
@@ -115,7 +124,16 @@ function App() {
     }
   }
 
-  // Upload gambar ke Cloudinary dan simpan proyek ke Firestore
+  // LOGOUT ADMIN
+  async function logout() {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  // UPLOAD PROJECT DAN GAMBAR
   async function saveProject(e) {
     e.preventDefault();
     setBusy(true);
@@ -126,9 +144,7 @@ function App() {
 
       if (file) {
         if (file.size > 5 * 1024 * 1024) {
-          throw new Error(
-            'Ukuran gambar maksimal 5 MB.'
-          );
+          throw new Error('Ukuran gambar maksimal 5 MB.');
         }
 
         const allowedTypes = [
@@ -190,6 +206,7 @@ function App() {
 
       setFile(null);
       setShowForm(false);
+      setError('');
 
     } catch (err) {
       setError(err.message);
@@ -198,7 +215,7 @@ function App() {
     }
   }
 
-  // Menghapus proyek
+  // MENGHAPUS PROJECT
   async function removeProject(p) {
     if (!confirm(`Hapus project "${p.title}"?`)) {
       return;
@@ -211,44 +228,89 @@ function App() {
     }
   }
 
+  // MENUTUP MENU MOBILE
+  function closeMenu() {
+    setShowMenu(false);
+  }
+
   return (
     <div className="page">
 
-      <nav className="nav wrap">
-        <a className="brand" href="#home">
+      {/* NAVIGASI */}
+      <nav className="nav wrap" id="top">
+
+        <a
+          className="brand"
+          href="#home"
+          onClick={closeMenu}
+        >
           <span className="brand-mark">P</span>
           APLANNYMW<span className="dot">.</span>
         </a>
 
-        <div className="nav-actions">
-          <a href="#projects">Project</a>
-          <a href="#about">Tentang</a>
+        <button
+          className="mobile-menu-btn"
+          type="button"
+          aria-label="Buka menu navigasi"
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          {showMenu ? <X size={22} /> : <Menu size={22} />}
+        </button>
+
+        <div className={`nav-actions ${showMenu ? 'menu-open' : ''}`}>
+
+          <a href="#home" onClick={closeMenu}>
+            <Home size={15} />
+            Beranda
+          </a>
+
+          <a href="#about" onClick={closeMenu}>
+            Tentang
+          </a>
+
+          <a href="#projects" onClick={closeMenu}>
+            Project
+          </a>
+
+          <a href="#contact" onClick={closeMenu}>
+            Contact
+          </a>
 
           {isAdmin ? (
             <button
               className="admin-btn"
-              onClick={() => signOut(auth)}
+              onClick={() => {
+                closeMenu();
+                logout();
+              }}
             >
-              <LogOut size={16} /> Keluar
+              <LogOut size={16} />
+              Keluar
             </button>
           ) : (
             <button
               className="admin-btn"
               onClick={() => {
+                closeMenu();
                 setError('');
                 setShowLogin(true);
               }}
             >
-              <LogIn size={16} /> Admin
+              <LogIn size={16} />
+              Admin
             </button>
           )}
+
         </div>
       </nav>
 
       <main>
 
+        {/* BERANDA */}
         <section className="hero wrap" id="home">
+
           <div className="hero-copy">
+
             <div className="eyebrow">
               <span />
               PORTFOLIO & PROJECT SHOWCASE
@@ -270,26 +332,33 @@ function App() {
             </p>
 
             <div className="hero-links">
+
               <a className="primary" href="#projects">
-                Lihat Project <ExternalLink size={16} />
+                Lihat Project
+                <ExternalLink size={16} />
               </a>
 
               <a
                 className="secondary"
-                href="https://github.com/Aplannymw"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
               >
-                <Github size={17} /> GitHub
+                <Github size={17} />
+                GitHub
               </a>
+
             </div>
+
           </div>
 
           <div className="hero-art">
+
             <div className="orb orb1" />
             <div className="orb orb2" />
 
             <div className="code-card">
+
               <div className="code-top">
                 <i />
                 <i />
@@ -310,17 +379,23 @@ function App() {
               </pre>
 
               <div className="code-foot">
-                <span /> Available for new ideas
+                <span />
+                Available for new ideas
               </div>
+
             </div>
 
             <div className="float-icon">
               <Code2 size={24} />
             </div>
+
           </div>
+
         </section>
 
+        {/* STATISTIK */}
         <section className="stats wrap">
+
           <div>
             <strong>
               {projects.length.toString().padStart(2, '0')}
@@ -337,18 +412,61 @@ function App() {
             <strong>01</strong>
             <span>Perjalanan kreatif</span>
           </div>
+
         </section>
 
+        {/* TENTANG */}
+        <section className="about wrap" id="about">
+
+          <div className="about-icon">
+            <UserRound size={30} />
+          </div>
+
+          <div>
+            <div className="eyebrow">
+              SEDIKIT TENTANG SAYA
+            </div>
+
+            <h2>Terus belajar, terus berkarya.</h2>
+
+            <p>
+              Saya adalah Aplannymw, seorang Web Developer
+              dengan minat di bidang IT. Saya senang
+              mengeksplorasi teknologi, membangun website,
+              dan mengembangkan ide menjadi solusi digital.
+            </p>
+
+            <p>
+              Saya terus belajar dan mencoba teknologi baru
+              untuk meningkatkan kemampuan serta menciptakan
+              karya digital yang bermanfaat.
+            </p>
+          </div>
+
+          <a className="secondary" href="#contact">
+            Hubungi saya
+            <ArrowUpRight size={16} />
+          </a>
+
+        </section>
+
+        {/* PROJECT */}
         <section
           className="projects-section wrap"
           id="projects"
         >
+
           <div className="section-head">
+
             <div>
-              <div className="eyebrow">KARYA SAYA</div>
+              <div className="eyebrow">
+                KARYA SAYA
+              </div>
+
               <h2>
                 Project pilihan<span className="dot">.</span>
               </h2>
+
               <p>
                 Kumpulan project yang pernah dan sedang
                 saya kerjakan.
@@ -358,25 +476,35 @@ function App() {
             {isAdmin && (
               <button
                 className="primary"
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  setError('');
+                  setShowForm(true);
+                }}
               >
-                <Plus size={17} /> Tambah Project
+                <Plus size={17} />
+                Tambah Project
               </button>
             )}
+
           </div>
 
-          {error && (
+          {error && !showLogin && !showForm && (
             <div className="error">{error}</div>
           )}
 
           {projects.length ? (
+
             <div className="project-grid">
+
               {projects.map(p => (
+
                 <article
                   className="project-card"
                   key={p.id}
                 >
+
                   <div className="project-image">
+
                     {p.imageUrl ? (
                       <img
                         src={p.imageUrl}
@@ -398,9 +526,11 @@ function App() {
                         <X size={16} />
                       </button>
                     )}
+
                   </div>
 
                   <div className="project-body">
+
                     <div className="tags">
                       {(p.tech || []).map((t, i) => (
                         <span key={i}>{t}</span>
@@ -408,6 +538,7 @@ function App() {
                     </div>
 
                     <h3>{p.title}</h3>
+
                     <p>{p.description}</p>
 
                     {p.url && (
@@ -421,12 +552,19 @@ function App() {
                         <ExternalLink size={15} />
                       </a>
                     )}
+
                   </div>
+
                 </article>
+
               ))}
+
             </div>
+
           ) : (
+
             <div className="empty">
+
               <div className="empty-icon">
                 <FolderGit2 size={28} />
               </div>
@@ -441,70 +579,101 @@ function App() {
               {isAdmin && (
                 <button
                   className="primary"
-                  onClick={() => setShowForm(true)}
+                  onClick={() => {
+                    setError('');
+                    setShowForm(true);
+                  }}
                 >
-                  <Plus size={16} /> Upload project pertama
+                  <Plus size={16} />
+                  Upload project pertama
                 </button>
               )}
+
             </div>
+
           )}
+
         </section>
 
-        <section className="about wrap" id="about">
-          <div className="about-icon">
-            <UserRound size={30} />
+        {/* CONTACT */}
+        <section
+          className="contact-section wrap"
+          id="contact"
+        >
+
+          <div className="eyebrow">
+            HUBUNGI SAYA
           </div>
 
-          <div>
-            <div className="eyebrow">
-              SEDIKIT TENTANG SAYA
-            </div>
+          <h2>
+            Punya ide menarik?
+            <br />
+            <span className="gradient">
+              Mari kita wujudkan bersama.
+            </span>
+          </h2>
 
-            <h2>Terus belajar, terus berkarya.</h2>
+          <p>
+            Saya terbuka untuk bertukar ide, berdiskusi
+            tentang teknologi, dan berkolaborasi dalam
+            pengembangan project digital.
+          </p>
 
-            <p>
-              Saya adalah Aplannymw, seorang Web Developer
-              dengan minat di bidang IT. Saya senang
-              mengeksplorasi teknologi, membangun website,
-              dan mengembangkan ide menjadi solusi digital.
-            </p>
+          <div className="contact-links">
+
+            <a
+              className="primary"
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Github size={18} />
+              Hubungi melalui GitHub
+              <ArrowUpRight size={16} />
+            </a>
+
           </div>
 
-          <a
-            href="https://github.com/Aplannymw"
-            className="secondary"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Hubungi saya <ExternalLink size={15} />
-          </a>
         </section>
 
       </main>
 
+      {/* FOOTER */}
       <footer className="footer wrap">
+
         <span>
           © {new Date().getFullYear()} Aplannymw.
           Dibuat dengan semangat berkarya.
         </span>
 
-        <a href="#home">Kembali ke atas ↑</a>
+        <a href="#home">
+          Kembali ke atas ↑
+        </a>
+
       </footer>
 
+      {/* MODAL LOGIN */}
       {showLogin && (
+
         <div
           className="overlay"
           onMouseDown={e => {
             if (e.target === e.currentTarget) {
               setShowLogin(false);
+              setError('');
             }
           }}
         >
+
           <form className="modal" onSubmit={login}>
+
             <button
               type="button"
               className="close"
-              onClick={() => setShowLogin(false)}
+              onClick={() => {
+                setShowLogin(false);
+                setError('');
+              }}
             >
               <X />
             </button>
@@ -547,33 +716,46 @@ function App() {
               className="primary full"
               type="submit"
             >
-              Masuk ke Dashboard <LogIn size={16} />
+              Masuk ke Dashboard
+              <LogIn size={16} />
             </button>
 
             <small>
               Akun admin dibuat melalui Firebase Authentication.
             </small>
+
           </form>
+
         </div>
+
       )}
 
+      {/* MODAL TAMBAH PROJECT */}
       {showForm && (
+
         <div
           className="overlay"
           onMouseDown={e => {
-            if (e.target === e.currentTarget) {
+            if (e.target === e.currentTarget && !busy) {
               setShowForm(false);
+              setError('');
             }
           }}
         >
+
           <form
             className="modal"
             onSubmit={saveProject}
           >
+
             <button
               type="button"
               className="close"
-              onClick={() => setShowForm(false)}
+              disabled={busy}
+              onClick={() => {
+                setShowForm(false);
+                setError('');
+              }}
             >
               <X />
             </button>
@@ -668,8 +850,11 @@ function App() {
               {busy ? 'Mengunggah...' : 'Publikasikan Project'}
               <UploadCloud size={16} />
             </button>
+
           </form>
+
         </div>
+
       )}
 
     </div>
