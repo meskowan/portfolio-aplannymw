@@ -11,12 +11,16 @@ import {
   UploadCloud,
   X,
   FolderGit2,
-  UserRound,
   Code2,
   Mail,
   ArrowUpRight,
   Home,
-  Menu
+  Menu,
+  Facebook,
+  Instagram,
+  MessageCircle,
+  Music2,
+  Globe
 } from 'lucide-react';
 
 import {
@@ -44,6 +48,9 @@ const CLOUDINARY_CLOUD_NAME = 'ew3vk9zg';
 const CLOUDINARY_UPLOAD_PRESET = 'aplannymw_unsigned';
 
 const GITHUB_URL = 'https://github.com/meskowan';
+
+// ALAMAT FOTO PROFIL
+const PROFILE_IMAGE = '/portfolio-aplannymw/profile.jpg';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -357,32 +364,11 @@ function App() {
             <div className="orb orb1" />
             <div className="orb orb2" />
 
-            <div className="code-card">
-
-              <div className="code-top">
-                <i />
-                <i />
-                <i />
-                <span>my-portfolio.js</span>
-              </div>
-
-              <pre>
-                <b>const</b> creator = {'{'}
-                {'\n'}  name: <strong>'Aplannymw'</strong>,
-                {'\n'}  passion: <strong>'Web Developer'</strong>,
-                {'\n'}  status: <strong>'Always learning'</strong>
-                {'\n'}{'}'};
-                {'\n\n'}
-                <b>function</b> <strong>createProject</strong>() {'{'}
-                {'\n'}  return <i>amazingThings;</i>
-                {'\n'}{'}'}
-              </pre>
-
-              <div className="code-foot">
-                <span />
-                Available for new ideas
-              </div>
-
+            <div className="profile-photo-frame">
+              <img
+                src={PROFILE_IMAGE}
+                alt="Foto profil Aplannymw"
+              />
             </div>
 
             <div className="float-icon">
@@ -419,7 +405,11 @@ function App() {
         <section className="about wrap" id="about">
 
           <div className="about-icon">
-            <UserRound size={30} />
+            <img
+              className="about-photo"
+              src={PROFILE_IMAGE}
+              alt="Foto Aplannymw"
+            />
           </div>
 
           <div>
@@ -622,14 +612,57 @@ function App() {
           <div className="contact-links">
 
             <a
-              className="primary"
+              href="https://wa.me/6282238594968"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MessageCircle size={18} />
+              WhatsApp
+            </a>
+
+            <a
+              href="https://www.facebook.com/search/top?q=dikwan%20q%20mw"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Facebook size={18} />
+              Facebook
+            </a>
+
+            <a
+              href="https://www.tiktok.com/@Aplannymw"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Music2 size={18} />
+              TikTok
+            </a>
+
+            <a
+              href="https://www.instagram.com/Aplannymw/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Instagram size={18} />
+              Instagram
+            </a>
+
+            <a
+              href="https://meskowan.github.io/portfolio-aplannymw/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Globe size={18} />
+              Website
+            </a>
+
+            <a
               href={GITHUB_URL}
               target="_blank"
               rel="noreferrer"
             >
               <Github size={18} />
-              Hubungi melalui GitHub
-              <ArrowUpRight size={16} />
+              GitHub
             </a>
 
           </div>
