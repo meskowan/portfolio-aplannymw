@@ -12,15 +12,14 @@ import {
   X,
   FolderGit2,
   Code2,
-  Mail,
-  ArrowUpRight,
   Home,
   Menu,
   Facebook,
   Instagram,
   MessageCircle,
   Music2,
-  Globe
+  Globe,
+  ArrowUpRight
 } from 'lucide-react';
 
 import {
@@ -49,7 +48,7 @@ const CLOUDINARY_UPLOAD_PRESET = 'aplannymw_unsigned';
 
 const GITHUB_URL = 'https://github.com/meskowan';
 
-// ALAMAT FOTO PROFIL
+// FOTO PROFIL
 const PROFILE_IMAGE = '/portfolio-aplannymw/profile.jpg';
 
 function App() {
@@ -73,12 +72,13 @@ function App() {
   const [file, setFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
 
   const isAdmin =
     !!user &&
     user.email?.toLowerCase() === ADMIN_EMAIL;
 
-  // MEMERIKSA STATUS LOGIN ADMIN
+  // MEMERIKSA STATUS LOGIN
   useEffect(() => {
     return onAuthStateChanged(auth, setUser);
   }, []);
@@ -100,7 +100,13 @@ function App() {
           }))
         );
       },
-      err => setError(err.message)
+      err => {
+        console.error('Firestore read error:', err);
+        setError(err.code
+          ? `${err.code}: ${err.message}`
+          : err.message
+        );
+      }
     );
   }, []);
 
@@ -126,7 +132,9 @@ function App() {
       setShowLogin(false);
       setPassword('');
       setEmail('');
+
     } catch (err) {
+      console.error('Login error:', err);
       setError(err.message);
     }
   }
@@ -140,18 +148,25 @@ function App() {
     }
   }
 
-  // UPLOAD PROJECT DAN GAMBAR
+  // UPLOAD DAN PUBLIKASIKAN PROJECT
   async function saveProject(e) {
     e.preventDefault();
+
+    if (busy) return;
+
     setBusy(true);
     setError('');
+    setStatus('Menyiapkan project...');
 
     try {
       let imageUrl = '';
 
+      // VALIDASI DAN UPLOAD GAMBAR
       if (file) {
         if (file.size > 5 * 1024 * 1024) {
-          throw new Error('Ukuran gambar maksimal 5 MB.');
+          throw new Error(
+            'Ukuran gambar maksimal 5 MB.'
+          );
         }
 
         const allowedTypes = [
@@ -165,6 +180,10 @@ function App() {
             'Format gambar harus JPG, PNG, atau WebP.'
           );
         }
+
+        setStatus(
+          'Mengunggah gambar ke Cloudinary...'
+        );
 
         const data = new FormData();
 
@@ -194,6 +213,11 @@ function App() {
         imageUrl = result.secure_url;
       }
 
+      // SIMPAN DATA KE FIRESTORE
+      setStatus(
+        'Mengirim data ke Firebase Firestore...'
+      );
+
       await addDoc(collection(db, 'projects'), {
         ...form,
         tech: form.tech
@@ -203,6 +227,10 @@ function App() {
         imageUrl,
         createdAt: serverTimestamp()
       });
+
+      setStatus(
+        'Project berhasil dipublikasikan!'
+      );
 
       setForm({
         title: '',
@@ -214,9 +242,22 @@ function App() {
       setFile(null);
       setShowForm(false);
       setError('');
+      setStatus('');
 
     } catch (err) {
-      setError(err.message);
+      console.error(
+        'Kesalahan publikasi project:',
+        err
+      );
+
+      setError(
+        err.code
+          ? `${err.code}: ${err.message}`
+          : err.message
+      );
+
+      setStatus('Publikasi gagal.');
+
     } finally {
       setBusy(false);
     }
@@ -229,8 +270,11 @@ function App() {
     }
 
     try {
-      await deleteDoc(doc(db, 'projects', p.id));
+      await deleteDoc(
+        doc(db, 'projects', p.id)
+      );
     } catch (err) {
+      console.error('Delete error:', err);
       setError(err.message);
     }
   }
@@ -264,7 +308,11 @@ function App() {
           {showMenu ? <X size={22} /> : <Menu size={22} />}
         </button>
 
-        <div className={`nav-actions ${showMenu ? 'menu-open' : ''}`}>
+        <div
+          className={`nav-actions ${
+            showMenu ? 'menu-open' : ''
+          }`}
+        >
 
           <a href="#home" onClick={closeMenu}>
             <Home size={15} />
@@ -468,6 +516,7 @@ function App() {
                 className="primary"
                 onClick={() => {
                   setError('');
+                  setStatus('');
                   setShowForm(true);
                 }}
               >
@@ -571,6 +620,7 @@ function App() {
                   className="primary"
                   onClick={() => {
                     setError('');
+                    setStatus('');
                     setShowForm(true);
                   }}
                 >
@@ -698,7 +748,10 @@ function App() {
           }}
         >
 
-          <form className="modal" onSubmit={login}>
+          <form
+            className="modal"
+            onSubmit={login}
+          >
 
             <button
               type="button"
@@ -772,6 +825,7 @@ function App() {
             if (e.target === e.currentTarget && !busy) {
               setShowForm(false);
               setError('');
+              setStatus('');
             }
           }}
         >
@@ -788,6 +842,7 @@ function App() {
               onClick={() => {
                 setShowForm(false);
                 setError('');
+                setStatus('');
               }}
             >
               <X />
@@ -871,6 +926,10 @@ function App() {
               }
             />
 
+            {status && (
+              <p>{status}</p>
+            )}
+
             {error && (
               <div className="error">{error}</div>
             )}
@@ -880,7 +939,9 @@ function App() {
               disabled={busy}
               type="submit"
             >
-              {busy ? 'Mengunggah...' : 'Publikasikan Project'}
+              {busy
+                ? 'Sedang memproses...'
+                : 'Publikasikan Project'}
               <UploadCloud size={16} />
             </button>
 
